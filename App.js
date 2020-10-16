@@ -1,21 +1,53 @@
 import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import 'react-native-gesture-handler';
+import * as React from 'react';
+import * as Font from 'expo-font';
+import { AppLoading } from 'expo';
+import { Assets, createStackNavigator } from '@react-navigation/stack';
+import { NavigationContainer } from '@react-navigation/native';
+import ComponentsScreen from './src/Components/ComponentsScreen';
+import ListScreen from './src/Components/ListScreen';
 
-export default function App() {
-  return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
-      <StatusBar style="auto" />
-    </View>
-  );
+const Stack = createStackNavigator();
+const customFonts = {
+  'Montserrat-Black': require('./assets/fonts/Montserrat-Black.ttf'),
+  'Montserrat-Bold': require('./assets/fonts/Montserrat-Bold.ttf'),
+  'Montserrat-BoldItalic': require('./assets/fonts/Montserrat-BoldItalic.ttf'),
+  'Montserrat-Italic': require('./assets/fonts/Montserrat-Italic.ttf'),
+  'Montserrat-Regular': require('./assets/fonts/Montserrat-Regular.ttf')
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default class App extends React.Component {
+  state = {
+    fontsLoaded: false,
+  };
+
+  async _loadFontsAsync() {
+    await Font.loadAsync(customFonts);
+    this.setState({ fontsLoaded: true});
+  }
+
+  componentDidMount(){
+    this._loadFontsAsync();
+  }
+
+  render(){
+    if(this.state.fontsLoaded){
+      return (
+        <NavigationContainer>
+          <Stack.Navigator initialRouteName="Tasks">
+            <Stack.Screen
+              name="Home"
+              component={ComponentsScreen}
+              options={{ title: 'App' }} />
+            <Stack.Screen
+              name="Tasks"
+              component={ListScreen} />
+          </Stack.Navigator>
+        </NavigationContainer>
+      );
+    } else {
+      return <AppLoading/>;
+    }
+  }
+}
